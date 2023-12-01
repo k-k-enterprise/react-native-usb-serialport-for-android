@@ -21,6 +21,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
+import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -96,7 +97,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
             return;
         }
 
-        PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, new Intent(INTENT_ACTION_GRANT_USB), 0);
+        PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, new Intent(INTENT_ACTION_GRANT_USB), PendingIntent.FLAG_IMMUTABLE);
         usbManager.requestPermission(device, usbPermissionIntent);
         promise.resolve(0);
     }
@@ -129,7 +130,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
             return;
         }
 
-        UsbSerialDriver driver = UsbSerialProber.getDefaultProber().probeDevice(device);
+		UsbSerialDriver driver = new CdcAcmSerialDriver(device);
         if (driver == null) {
             promise.reject(CODE_DRIVER_NOT_FOND, "no driver for device");
             return;
